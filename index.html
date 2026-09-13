@@ -10,9 +10,21 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
 
+<!-- Meta Etiquetas Básicas de SEO -->
+<title>SMAK. — Drop 015</title>
+<meta name="description" content="Edición limitada. Accesos exclusivos al Drop 015 de SMAK.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Open Graph / Facebook / WhatsApp -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://luiscgg-mx.github.io/smak-web/">
+<meta property="og:title" content="SMAK. — Drop 015">
+<meta property="og:description" content="Edición limitada. Reserva tu acceso antes de que se agoten las plazas.">
+<meta property="og:image" content="https://luiscgg-mx.github.io/smak-web/assets/images/og-cover.jpg">
 
 </head>
 <link rel="stylesheet" href="css/styles.css">
+
 <body>
 
 <main>
@@ -180,11 +192,13 @@
         </div>
         <div class="newsletter-side">
           <p class="eyebrow" style="margin-bottom: 6px;">Alertas Privadas</p>
-          <form class="subscribe" action="#" method="post">
+          <form class="subscribe-form" id="subscribe-form" action="#" method="post">
             <label for="email" class="visually-hidden">Correo electrónico</label>
             <input id="email" name="email" type="email" placeholder="Tu correo electrónico" required>
             <button type="submit">Suscribirme →</button>
+            
           </form>
+          <div id="form-feedback" class="form-feedback"></div>
         </div>
       </section>
 

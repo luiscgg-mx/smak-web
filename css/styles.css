@@ -277,12 +277,12 @@ details[open] summary:after { transform: rotate(45deg); }
   max-width: 400px; 
 }
 
-.subscribe { 
+.subscribe-form { 
   display: flex; 
   width: 100%; 
   border-bottom: 1px solid var(--ink); 
 }
-.subscribe input { 
+.subscribe-form input { 
   min-width: 0; 
   flex: 1; 
   padding: 10px 0; 
@@ -292,8 +292,8 @@ details[open] summary:after { transform: rotate(45deg); }
   font: 500 12px "DM Sans", sans-serif; 
   outline: none; 
 }
-.subscribe input::placeholder { color: #66685f; }
-.subscribe button { 
+.subscribe-form input::placeholder { color: #66685f; }
+.subscribe-form button { 
   border: 0; 
   background: transparent; 
   padding: 10px 0 10px 14px; 
