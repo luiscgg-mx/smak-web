@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso Confirmado — SMAK.</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+  <style>
+    .thankyou-wrapper {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .thankyou-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #10B981; /* Verde neón/éxito */
+      margin-bottom: 16px;
+    }
+    .thankyou-title {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    .thankyou-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 32px;
+    }
+    .confirmation-box {
+      border: 1px solid var(--ink);
+      padding: 20px;
+      width: 100%;
+      margin-bottom: 32px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .back-link {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--ink);
+      padding-bottom: 4px;
+    }
+    .back-link:hover {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <main class="thankyou-wrapper">
+    <div class="thankyou-badge">● Reserva Confirmada</div>
+    <h1 class="thankyou-title">Tu lugar está asegurado.</h1>
+    
+    <div class="confirmation-box">
+      <p><strong>DROP 015:</strong> Zapote Negro</p>
+      <p style="margin-top: 8px;"><strong>Estado:</strong> Confirmado via Stripe</p>
+    </div>
+
+    <p class="thankyou-text">
+      Hemos enviado los detalles y el código de acceso a tu correo electrónico. Presenta tu confirmación al llegar al establecimiento.
+    </p>
+
+    <a href="index.html" class="back-link">← Volver al sitio principal</a>
+  </main>
+</body>
+</html>
