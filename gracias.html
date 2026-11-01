@@ -95,16 +95,20 @@
     <div class="thankyou-badge">● Acceso Confirmado</div>
     <h1 class="thankyou-title">Lugar Asegurado.</h1>
     
-    <!-- TICKET DIGITAL CON FOLIO STRIPE -->
+    <!-- TICKET DIGITAL DINÁMICO -->
     <div class="ticket-box">
       <div class="ticket-header">SMAK. VIP ACCESS PASS</div>
       <div class="ticket-row">
         <span>DROP:</span>
-        <strong>015 — Zapote Negro</strong>
+        <strong id="ticket-drop">015 — Zapote Negro</strong>
       </div>
       <div class="ticket-row">
-        <span>PRECIO:</span>
-        <strong>$800 MXN</strong>
+        <span>CANTIDAD:</span>
+        <strong id="ticket-qty">1 ACCESO</strong>
+      </div>
+      <div class="ticket-row">
+        <span>PRECIO UNITARIO:</span>
+        <strong id="ticket-price">$800 MXN</strong>
       </div>
       <div class="ticket-row">
         <span>ESTADO:</span>
@@ -116,7 +120,7 @@
     </div>
 
     <p class="instruction-note">
-      <strong>Instrucciones para el acceso:</strong> Muestra esta pantalla o tu recibo de correo al llegar al restaurante. Tu folio está vinculado de forma directa con la lista oficial de Stripe.
+      <strong>Instrucciones para el restaurante:</strong> Muestra esta pantalla o tu recibo de Stripe al llegar. Si compraste múltiples lugares, todo el grupo debe ingresar con este mismo folio.
     </p>
 
     <a href="index.html" class="back-link">← Volver al sitio principal</a>
@@ -124,19 +128,31 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Capturar los parámetros de la URL
+      // Capturar los parámetros enviados en la URL por Stripe
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get('session_id');
-      const bookingCodeElement = document.getElementById('booking-code');
+      const dropParam = urlParams.get('drop') || '015';
+      const priceParam = urlParams.get('price') || '800';
+      const qtyParam = urlParams.get('qty') || '1';
 
+      // Elementos del DOM
+      const bookingCodeElement = document.getElementById('booking-code');
+      const priceElement = document.getElementById('ticket-price');
+      const qtyElement = document.getElementById('ticket-qty');
+      const dropElement = document.getElementById('ticket-drop');
+
+      // 1. Asignar el Folio Real de Stripe
       if (sessionId) {
-        // Formatear los últimos 8 caracteres del ID oficial de Stripe en mayúsculas
         const shortCode = sessionId.slice(-8).toUpperCase();
-        bookingCodeElement.textContent = `SMK-015-${shortCode}`;
+        bookingCodeElement.textContent = `SMK-${dropParam}-${shortCode}`;
       } else {
-        // En caso de acceso directo sin parámetro en URL
-        bookingCodeElement.textContent = `SMK-015-VERIFIED`;
+        bookingCodeElement.textContent = `SMK-${dropParam}-VERIFIED`;
       }
+
+      // 2. Asignar Valores Dinámicos
+      if (priceElement) priceElement.textContent = `$${priceParam} MXN`;
+      if (qtyElement) qtyElement.textContent = `${qtyParam} ${parseInt(qtyParam, 10) > 1 ? 'ACCESOS' : 'ACCESO'}`;
+      if (dropElement) dropElement.textContent = `${dropParam} — Zapote Negro`;
     });
   </script>
 </body>
