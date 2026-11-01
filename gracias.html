@@ -10,13 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
   <style>
     .thankyou-wrapper {
-      min-height: 80vh;
+      min-height: 85vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: flex-start;
       padding: 40px 20px;
-      max-width: 600px;
+      max-width: 520px;
       margin: 0 auto;
     }
     .thankyou-badge {
@@ -24,31 +24,57 @@
       font-weight: 700;
       letter-spacing: 0.15em;
       text-transform: uppercase;
-      color: #10B981; /* Verde neón/éxito */
+      color: #10B981;
       margin-bottom: 16px;
     }
     .thankyou-title {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.03em;
       margin-bottom: 24px;
       text-transform: uppercase;
     }
-    .thankyou-text {
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--ink);
-      margin-bottom: 32px;
-    }
-    .confirmation-box {
-      border: 1px solid var(--ink);
-      padding: 20px;
+    .ticket-box {
+      border: 2px solid var(--ink, #000);
+      padding: 24px;
       width: 100%;
-      margin-bottom: 32px;
-      font-size: 12px;
+      margin-bottom: 24px;
+      background: #FAFAFA;
+      box-sizing: border-box;
+    }
+    .ticket-header {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      color: #666;
+      margin-bottom: 12px;
+      border-bottom: 1px dashed #CCC;
+      padding-bottom: 8px;
+    }
+    .ticket-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .ticket-code {
+      font-family: monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--ink, #000);
+    }
+    .instruction-note {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #555;
+      margin-bottom: 32px;
+      border-left: 2px solid var(--ink, #000);
+      padding-left: 12px;
     }
     .back-link {
       display: inline-block;
@@ -56,31 +82,51 @@
       font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--ink);
+      color: var(--ink, #000);
       text-decoration: none;
-      border-bottom: 1px solid var(--ink);
+      border-bottom: 1px solid var(--ink, #000);
       padding-bottom: 4px;
-    }
-    .back-link:hover {
-      opacity: 0.6;
     }
   </style>
 </head>
 <body>
   <main class="thankyou-wrapper">
-    <div class="thankyou-badge">● Reserva Confirmada</div>
-    <h1 class="thankyou-title">Tu lugar está asegurado.</h1>
+    <div class="thankyou-badge">● Acceso Confirmado</div>
+    <h1 class="thankyou-title">Lugar Asegurado.</h1>
     
-    <div class="confirmation-box">
-      <p><strong>DROP 015:</strong> Zapote Negro</p>
-      <p style="margin-top: 8px;"><strong>Estado:</strong> Confirmado via Stripe</p>
+    <!-- TICKET DIGITAL DE ACCESO -->
+    <div class="ticket-box">
+      <div class="ticket-header">SMAK. VIP ACCESS PASS</div>
+      <div class="ticket-row">
+        <span>DROP:</span>
+        <strong>015 — Zapote Negro</strong>
+      </div>
+      <div class="ticket-row">
+        <span>PRECIO:</span>
+        <strong>$800 MXN</strong>
+      </div>
+      <div class="ticket-row">
+        <span>ESTADO:</span>
+        <strong style="color: #10B981;">PAGADO</strong>
+      </div>
+      <div class="ticket-code">
+        FOLIO: <span id="booking-code">SMK-015-XXXX</span>
+      </div>
     </div>
 
-    <p class="thankyou-text">
-      Hemos enviado los detalles y el código de acceso a tu correo electrónico. Presenta tu confirmación al llegar al establecimiento.
+    <p class="instruction-note">
+      <strong>Instrucciones para el restaurante:</strong> Toma una captura de pantalla a este ticket y muéstralo al hostess/mesero al llegar al establecimiento junto con tu identificación.
     </p>
 
     <a href="index.html" class="back-link">← Volver al sitio principal</a>
   </main>
+
+  <script>
+    // Generar un código aleatorio único al cargar el ticket
+    document.addEventListener('DOMContentLoaded', () => {
+      const randomCode = Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('booking-code').textContent = `SMK-015-${randomCode}`;
+    });
+  </script>
 </body>
 </html>
