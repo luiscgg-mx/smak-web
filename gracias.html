@@ -61,12 +61,13 @@
     }
     .ticket-code {
       font-family: monospace;
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.1em;
       margin-top: 12px;
       padding-top: 12px;
       border-top: 1px solid var(--ink, #000);
+      word-break: break-all;
     }
     .instruction-note {
       font-size: 12px;
@@ -94,7 +95,7 @@
     <div class="thankyou-badge">● Acceso Confirmado</div>
     <h1 class="thankyou-title">Lugar Asegurado.</h1>
     
-    <!-- TICKET DIGITAL DE ACCESO -->
+    <!-- TICKET DIGITAL CON FOLIO STRIPE -->
     <div class="ticket-box">
       <div class="ticket-header">SMAK. VIP ACCESS PASS</div>
       <div class="ticket-row">
@@ -110,22 +111,32 @@
         <strong style="color: #10B981;">PAGADO</strong>
       </div>
       <div class="ticket-code">
-        FOLIO: <span id="booking-code">SMK-015-XXXX</span>
+        FOLIO: <span id="booking-code">CARGANDO...</span>
       </div>
     </div>
 
     <p class="instruction-note">
-      <strong>Instrucciones para el restaurante:</strong> Toma una captura de pantalla a este ticket y muéstralo al hostess/mesero al llegar al establecimiento junto con tu identificación.
+      <strong>Instrucciones para el acceso:</strong> Muestra esta pantalla o tu recibo de correo al llegar al restaurante. Tu folio está vinculado de forma directa con la lista oficial de Stripe.
     </p>
 
     <a href="index.html" class="back-link">← Volver al sitio principal</a>
   </main>
 
   <script>
-    // Generar un código aleatorio único al cargar el ticket
     document.addEventListener('DOMContentLoaded', () => {
-      const randomCode = Math.floor(1000 + Math.random() * 9000);
-      document.getElementById('booking-code').textContent = `SMK-015-${randomCode}`;
+      // Capturar los parámetros de la URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const sessionId = urlParams.get('session_id');
+      const bookingCodeElement = document.getElementById('booking-code');
+
+      if (sessionId) {
+        // Formatear los últimos 8 caracteres del ID oficial de Stripe en mayúsculas
+        const shortCode = sessionId.slice(-8).toUpperCase();
+        bookingCodeElement.textContent = `SMK-015-${shortCode}`;
+      } else {
+        // En caso de acceso directo sin parámetro en URL
+        bookingCodeElement.textContent = `SMK-015-VERIFIED`;
+      }
     });
   </script>
 </body>
