@@ -130,46 +130,47 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get('session_id');
-      const dropParam = urlParams.get('drop') || '015';
-      const priceParam = urlParams.get('price') || '800';
-      const qtyParam = urlParams.get('qty') || '1';
 
       const bookingCodeElement = document.getElementById('booking-code');
       const priceElement = document.getElementById('ticket-price');
       const qtyElement = document.getElementById('ticket-qty');
       const dropElement = document.getElementById('ticket-drop');
 
-      // 1. Mostrar datos básicos de inmediato usando los parámetros de la URL
-      if (sessionId) {
-        const shortCode = sessionId.slice(-8).toUpperCase();
-        bookingCodeElement.textContent = `SMK-${dropParam}-${shortCode}`;
-      } else {
-        bookingCodeElement.textContent = `SMK-${dropParam}-VERIFIED`;
+      if (!sessionId) {
+        bookingCodeElement.textContent = 'SMK-015-VERIFIED';
+        return;
       }
 
-      if (qtyElement) {
-        const cleanQty = qtyParam.replace(/[^0-9]/g, '') || '1';
-        qtyElement.textContent = `${cleanQty} ${parseInt(cleanQty, 10) > 1 ? 'ACCESOS' : 'ACCESO'}`;
-      }
-      if (priceElement) {
-        priceElement.textContent = `$${priceParam} MXN`;
-      }
-      if (dropElement) {
-        dropElement.textContent = `${dropParam} — Zapote Negro`;
-      }
+      // 1. Mostrar el folio visual base con el ID de Stripe
+      const shortCode = sessionId.slice(-8).toUpperCase();
+      bookingCodeElement.textContent = `SMK-015-${shortCode}`;
 
-      // 2. Intentar disparar el correo en segundo plano (Opcional, no bloquea la pantalla si falla)
-      if (sessionId) {
-        try {
-          await fetch('/api/send-ticket', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
-          });
-          console.log('Intento de envío de correo realizado.');
-        } catch (err) {
-          console.log('Aviso: La función serverless no está activa en este entorno local, pero el ticket visual opera correctamente.');
+      // 2. Consultar al servidor para obtener la cantidad real de accesos comprados
+      try {
+        const response = await fetch('/api/send-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Actualizar cantidad real (ej. "2 ACCESOS" o "1 ACCESO")
+          if (qtyElement && data.quantity) {
+            qtyElement.textContent = `${data.quantity} ${data.quantity > 1 ? 'ACCESOS' : 'ACCESO'}`;
+          }
+          // Actualizar precio total o unitario real
+          if (priceElement && data.amountTotal) {
+            priceElement.textContent = `$${data.amountTotal} MXN`;
+          }
+          if (dropElement && data.dropName) {
+            dropElement.textContent = data.dropName;
+          }
+          console.log('Datos sincronizados con éxito desde Stripe. Cantidad:', data.quantity);
         }
+      } catch (err) {
+        console.error('Error al sincronizar con el servidor:', err);
       }
     });
   </script>
