@@ -28,8 +28,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   const buyButton = document.querySelector('.buy');
   const statusText = document.getElementById('drop-status');
 
-  // Primero pintamos el valor por defecto para que no parpadee vacío
-  updateDropStatus();
+// Opcional: Mostrar un texto de carga sutil en los elementos antes de que llegue Stripe
+  const availableElement = document.getElementById('drop-available');
+  if (availableElement) availableElement.textContent = '...';
 
   try {
     // Consultar disponibilidad real a Stripe vía Vercel
