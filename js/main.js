@@ -22,13 +22,13 @@ function updateDropStatus() {
   }
 }
 
+
 // Ejecutar automáticamente al cargar la página
 document.addEventListener('DOMContentLoaded', async () => {
-  const PRODUCT_ID = 'prod_VY8qnaVz1Yz2c1'; // <--- Pon tu ID real de Stripe aquí (ej. prod_R123abc...)
+  const PRODUCT_ID = 'prod_VY8qnaVz1Yz2c1'; 
   const buyButton = document.querySelector('.buy');
   const statusText = document.getElementById('drop-status');
 
-// Opcional: Mostrar un texto de carga sutil en los elementos antes de que llegue Stripe
   const availableElement = document.getElementById('drop-available');
   if (availableElement) availableElement.textContent = '...';
 
@@ -38,13 +38,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await response.json();
 
     // Actualizamos el objeto con los datos reales que devuelve Stripe
-    dropConfig.availableSlots = data.remaining;
+    if (typeof data.remaining === 'number') {
+      dropConfig.availableSlots = data.remaining;
+    }
 
     // Volvemos a llamar a tu función para que redibuje la barra y los números con el dato real
     updateDropStatus();
 
-    // Si ya no hay lugares o la API indica que no está disponible
-    if (!data.isAvailable || data.remaining <= 0) {
+    // 🔒 CORRECCIÓN CLAVE: El botón SOLO se bloquea si el stock real es menor o igual a 0.
+    // Ignoramos data.isAvailable por si el servidor lo mandaba erróneo.
+    if (dropConfig.availableSlots <= 0) {
       if (buyButton) {
         buyButton.textContent = 'SOLD OUT — AGOTADO';
         buyButton.removeAttribute('href');
@@ -56,9 +59,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         statusText.textContent = '● DROP AGOTADO';
         statusText.style.color = '#EF4444';
       }
+    } else {
+      // Si hay stock (como tus 30 lugares), nos aseguramos de que el botón esté activo
+      if (buyButton) {
+        buyButton.style.opacity = '1';
+        buyButton.style.cursor = 'pointer';
+        buyButton.style.pointerEvents = 'auto';
+      }
+      if (statusText) {
+        statusText.textContent = '● DROP DISPONIBLE';
+        statusText.style.color = '#10B981'; // Verde activo
+      }
     }
   } catch (error) {
     console.error('Error al sincronizar inventario con Stripe:', error);
+    // Si falla la API por alguna razón, dejamos los valores estáticos por defecto (20 slots) para no bloquear la venta
+    updateDropStatus();
   }
 });
 
