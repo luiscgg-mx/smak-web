@@ -1,3 +1,22 @@
+<script>
+  // 1. Aquí puedes colocar la función que creamos (puede ir al inicio o final del script)
+  async function triggerConfirmationEmail(customerEmail, sessionId, dropName, quantity) {
+    try {
+      await fetch('/api/send-ticket', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: customerEmail,
+          session_id: sessionId,
+          drop_name: dropName,
+          qty: quantity
+        })
+      });
+    } catch (err) {
+      console.error('No se pudo disparar el correo de confirmación:', err);
+    }
+  }
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -157,3 +176,4 @@
   </script>
 </body>
 </html>
+
