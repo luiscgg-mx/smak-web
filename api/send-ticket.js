@@ -1,7 +1,6 @@
 const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { Resend } = require('resend');
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,29 +14,33 @@ module.exports = async (req, res) => {
   const { session_id } = req.body;
 
   if (!session_id) {
+    console.error('Error: Falta session_id en el body');
     return res.status(400).json({ error: 'Falta el session_id' });
   }
 
   try {
-    // 1. Consultar la sesión real directamente a Stripe
+    console.log('Consultando Stripe para la sesión:', session_id);
     const session = await stripe.checkout.sessions.retrieve(session_id, {
       expand: ['line_items', 'customer']
     });
 
-    const customerEmail = session.customer_details?.email || session.customer_email;
+    const customerEmail = session.customer_details?.email || session.customer_email || 'luisc.gg@gmail.com';
     const amountTotal = session.amount_total ? session.amount_total / 100 : 800;
     
-    // Obtener la cantidad de accesos comprados
     const lineItems = await stripe.checkout.sessions.listLineItems(session_id);
     const quantity = lineItems.data[0]?.quantity || 1;
     const dropName = lineItems.data[0]?.description || 'SMAK. Drop';
 
-    if (!customerEmail) {
-      throw new Error('No se encontró el email del cliente en la sesión de Stripe');
+    console.log('Datos de Stripe obtenidos con éxito. Email:', customerEmail);
+
+    // Inicializar Resend aquí dentro para asegurar que use la clave
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY no está definida en las variables de entorno de Vercel');
     }
 
-    // 2. Enviar el correo con Resend
-    // Nota: En modo prueba de Resend, pon aquí tu propio correo con el que te registraste en Resend para recibirlo
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    console.log('Intentando enviar correo con Resend a:', customerEmail);
     const emailResponse = await resend.emails.send({
       from: 'SMAK. <onboarding@resend.dev>',
       to: [customerEmail], 
@@ -60,17 +63,11 @@ module.exports = async (req, res) => {
       `,
     });
 
-    return res.status(200).json({ 
-      success: true, 
-      email: customerEmail, 
-      quantity, 
-      amount: amountTotal,
-      dropName,
-      emailResponse 
-    });
+    console.log('Correo enviado correctamente por Resend:', emailResponse);
+    return res.status(200).json({ success: true, email: customerEmail, quantity, amount: amountTotal });
 
   } catch (error) {
-    console.error('Error procesando ticket:', error);
+    console.error('ERROR DETALLADO EN /api/send-ticket:', error.message);
     return res.status(500).json({ error: error.message });
   }
 };
