@@ -75,9 +75,7 @@
             <div class="total-note">de <span id="drop-total">60</span> accesos totales</div>
           </div>
         </div>
-        <a class="buy" href="https://buy.stripe.com/test_9B6bJ124w7iw1ka3vH00000" target="_blank" rel="noopener noreferrer">
-  Comprar acceso <span>→</span>
-</a>
+        <a class="buy" href="https://buy.stripe.com/test_9B6bJ124w7iw1ka3vH00000" target="_blank" rel="noopener noreferrer">Comprar acceso <span>→</span></a>
       </footer>
     </article>
 
@@ -215,6 +213,42 @@
 </main>
 
 <script src="js/main.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const PRODUCT_ID = 'prod_VY8qnaVz1Yz2c1'; // Reemplaza por tu prod_... de Stripe
+    const TOTAL_LIMIT = 30; // El límite total de accesos para este drop
+
+    const buyButton = document.querySelector('.buy'); // Asegúrate de que tu botón de compra tenga la clase 'buy'
+    const statusText = document.getElementById('drop-status'); // Opcional: un span para mostrar "Quedan X lugares"
+
+    try {
+      const response = await fetch(`/api/check-availability?product_id=${PRODUCT_ID}&limit=${TOTAL_LIMIT}`);
+      const data = await response.json();
+
+      if (data.isAvailable) {
+        if (statusText) {
+          statusText.textContent = `● QUEDAN ${data.remaining} ACCESOS`;
+        }
+      } else {
+        // Si ya se vendieron todos
+        if (buyButton) {
+          buyButton.textContent = 'SOLD OUT — AGOTADO';
+          buyButton.removeAttribute('href');
+          buyButton.style.opacity = '0.5';
+          buyButton.style.cursor = 'not-allowed';
+          buyButton.style.pointerEvents = 'none';
+        }
+        if (statusText) {
+          statusText.textContent = '● DROP AGOTADO';
+          statusText.style.color = '#EF4444'; // Rojo
+        }
+      }
+    } catch (error) {
+      console.error('No se pudo verificar la disponibilidad:', error);
+    }
+  });
+</script>
 
 </body>
 </html>
