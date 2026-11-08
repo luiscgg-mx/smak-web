@@ -141,11 +141,9 @@
         return;
       }
 
-      // 1. Mostrar el folio visual base con el ID de Stripe
       const shortCode = sessionId.slice(-8).toUpperCase();
       bookingCodeElement.textContent = `SMK-015-${shortCode}`;
 
-      // 2. Consultar al servidor para obtener la cantidad real de accesos comprados
       try {
         const response = await fetch('/api/send-ticket', {
           method: 'POST',
@@ -153,24 +151,29 @@
           body: JSON.stringify({ session_id: sessionId })
         });
 
+        // Verificamos si el servidor respondió con error HTTP (ej: 500 o 404)
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Servidor respondió ${response.status}: ${errorText}`);
+        }
+
         const data = await response.json();
 
         if (data.success) {
-          // Actualizar cantidad real (ej. "2 ACCESOS" o "1 ACCESO")
           if (qtyElement && data.quantity) {
             qtyElement.textContent = `${data.quantity} ${data.quantity > 1 ? 'ACCESOS' : 'ACCESO'}`;
           }
-          // Actualizar precio total o unitario real
           if (priceElement && data.amountTotal) {
             priceElement.textContent = `$${data.amountTotal} MXN`;
           }
           if (dropElement && data.dropName) {
             dropElement.textContent = data.dropName;
           }
-          console.log('Datos sincronizados con éxito desde Stripe. Cantidad:', data.quantity);
         }
       } catch (err) {
-        console.error('Error al sincronizar con el servidor:', err);
+        console.error('Error atrapado:', err);
+        // ¡Esto pintará el error exacto en la pantalla para verlo de inmediato!
+        qtyElement.textContent = `ERROR: ${err.message}`;
       }
     });
   </script>
