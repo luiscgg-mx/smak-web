@@ -145,13 +145,9 @@
       bookingCodeElement.textContent = `SMK-015-${shortCode}`;
 
       try {
-        const response = await fetch('/api/send-ticket', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: sessionId })
-        });
+        // Usamos GET enviando el session_id por query param (igual que tu función de inventario)
+        const response = await fetch(`/api/send-ticket?session_id=${sessionId}`);
 
-        // Verificamos si el servidor respondió con error HTTP (ej: 500 o 404)
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Servidor respondió ${response.status}: ${errorText}`);
@@ -172,7 +168,6 @@
         }
       } catch (err) {
         console.error('Error atrapado:', err);
-        // ¡Esto pintará el error exacto en la pantalla para verlo de inmediato!
         qtyElement.textContent = `ERROR: ${err.message}`;
       }
     });
