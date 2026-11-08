@@ -1,22 +1,3 @@
-<script>
-  // 1. Aquí puedes colocar la función que creamos (puede ir al inicio o final del script)
-  async function triggerConfirmationEmail(customerEmail, sessionId, dropName, quantity) {
-    try {
-      await fetch('/api/send-ticket', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: customerEmail,
-          session_id: sessionId,
-          drop_name: dropName,
-          qty: quantity
-        })
-      });
-    } catch (err) {
-      console.error('No se pudo disparar el correo de confirmación:', err);
-    }
-  }
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -146,6 +127,24 @@
   </main>
 
   <script>
+    // Función para disparar el correo de confirmación de forma independiente
+    async function triggerConfirmationEmail(sessionId, dropName, quantity) {
+      try {
+        await fetch('/api/send-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'cliente@smak.local', // O tu correo de prueba por ahora
+            session_id: sessionId,
+            drop_name: dropName,
+            qty: quantity
+          })
+        });
+      } catch (err) {
+        console.error('No se pudo disparar el correo de confirmación:', err);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       // Capturar los parámetros enviados en la URL por Stripe
       const urlParams = new URLSearchParams(window.location.search);
@@ -164,6 +163,9 @@
       if (sessionId) {
         const shortCode = sessionId.slice(-8).toUpperCase();
         bookingCodeElement.textContent = `SMK-${dropParam}-${shortCode}`;
+        
+        // Disparar el envío del correo en segundo plano
+        triggerConfirmationEmail(sessionId, `Drop ${dropParam} — Zapote Negro`, qtyParam);
       } else {
         bookingCodeElement.textContent = `SMK-${dropParam}-VERIFIED`;
       }
@@ -176,4 +178,3 @@
   </script>
 </body>
 </html>
-
