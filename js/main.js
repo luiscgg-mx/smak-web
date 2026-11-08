@@ -23,7 +23,43 @@ function updateDropStatus() {
 }
 
 // Ejecutar automáticamente al cargar la página
-document.addEventListener('DOMContentLoaded', updateDropStatus);
+document.addEventListener('DOMContentLoaded', async () => {
+  const PRODUCT_ID = 'prod_VY8qnaVz1Yz2c1'; // <--- Pon tu ID real de Stripe aquí (ej. prod_R123abc...)
+  const buyButton = document.querySelector('.buy');
+  const statusText = document.getElementById('drop-status');
+
+  // Primero pintamos el valor por defecto para que no parpadee vacío
+  updateDropStatus();
+
+  try {
+    // Consultar disponibilidad real a Stripe vía Vercel
+    const response = await fetch(`/api/check-availability?product_id=${PRODUCT_ID}&limit=${dropConfig.totalSlots}`);
+    const data = await response.json();
+
+    // Actualizamos el objeto con los datos reales que devuelve Stripe
+    dropConfig.availableSlots = data.remaining;
+
+    // Volvemos a llamar a tu función para que redibuje la barra y los números con el dato real
+    updateDropStatus();
+
+    // Si ya no hay lugares o la API indica que no está disponible
+    if (!data.isAvailable || data.remaining <= 0) {
+      if (buyButton) {
+        buyButton.textContent = 'SOLD OUT — AGOTADO';
+        buyButton.removeAttribute('href');
+        buyButton.style.opacity = '0.5';
+        buyButton.style.cursor = 'not-allowed';
+        buyButton.style.pointerEvents = 'none';
+      }
+      if (statusText) {
+        statusText.textContent = '● DROP AGOTADO';
+        statusText.style.color = '#EF4444';
+      }
+    }
+  } catch (error) {
+    console.error('Error al sincronizar inventario con Stripe:', error);
+  }
+});
 
 // Manejo del formulario de suscripción
 const subscribeForm = document.getElementById('subscribe-form');
