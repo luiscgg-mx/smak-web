@@ -145,8 +145,13 @@
       bookingCodeElement.textContent = `SMK-015-${shortCode}`;
 
       try {
-        // Usamos GET enviando el session_id por query param (igual que tu función de inventario)
-        const response = await fetch(`/api/send-ticket?session_id=${sessionId}`);
+        // 🛑 CAMBIO CLAVE: Usa tu URL absoluta de Vercel en lugar de una ruta relativa
+        const apiUrl = `https://smak-web.vercel.app/api/send-ticket?session_id=${sessionId}`;
+        
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        });
 
         if (!response.ok) {
           const errorText = await response.text();
