@@ -126,54 +126,54 @@
     <a href="index.html" class="back-link">← Volver al sitio principal</a>
   </main>
 
-  <script>
-    // Función para disparar el correo de confirmación de forma independiente
-    async function triggerConfirmationEmail(sessionId, dropName, quantity) {
-      try {
-        await fetch('/api/send-ticket', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: 'cliente@smak.local', // O tu correo de prueba por ahora
-            session_id: sessionId,
-            drop_name: dropName,
-            qty: quantity
-          })
-        });
-      } catch (err) {
-        console.error('No se pudo disparar el correo de confirmación:', err);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      // Capturar los parámetros enviados en la URL por Stripe
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get('session_id');
-      const dropParam = urlParams.get('drop') || '015';
-      const priceParam = urlParams.get('price') || '800';
-      const qtyParam = urlParams.get('qty') || '1';
 
-      // Elementos del DOM
       const bookingCodeElement = document.getElementById('booking-code');
       const priceElement = document.getElementById('ticket-price');
       const qtyElement = document.getElementById('ticket-qty');
       const dropElement = document.getElementById('ticket-drop');
 
-      // 1. Asignar el Folio Real de Stripe
-      if (sessionId) {
-        const shortCode = sessionId.slice(-8).toUpperCase();
-        bookingCodeElement.textContent = `SMK-${dropParam}-${shortCode}`;
-        
-        // Disparar el envío del correo en segundo plano
-        triggerConfirmationEmail(sessionId, `Drop ${dropParam} — Zapote Negro`, qtyParam);
-      } else {
-        bookingCodeElement.textContent = `SMK-${dropParam}-VERIFIED`;
+      if (!sessionId) {
+        bookingCodeElement.textContent = 'SMK-015-VERIFIED';
+        return;
       }
 
-      // 2. Asignar Valores Dinámicos
-      if (priceElement) priceElement.textContent = `$${priceParam} MXN`;
-      if (qtyElement) qtyElement.textContent = `${qtyParam} ${parseInt(qtyParam, 10) > 1 ? 'ACCESOS' : 'ACCESO'}`;
-      if (dropElement) dropElement.textContent = `${dropParam} — Zapote Negro`;
+      // 1. Generar el Folio visual con el ID de Stripe
+      const shortCode = sessionId.slice(-8).toUpperCase();
+      bookingCodeElement.textContent = `SMK-015-${shortCode}`;
+
+      try {
+        // 2. Llamar a nuestra API para registrar/enviar correo y obtener datos reales
+        const response = await fetch('/api/send-ticket', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // 3. Pintar dinámicamente los datos reales obtenidos de Stripe
+          if (qtyElement) {
+            qtyElement.textContent = `${data.quantity} ${data.quantity > 1 ? 'ACCESOS' : 'ACCESO'}`;
+          }
+          if (priceElement) {
+            priceElement.textContent = `$${data.amount} MXN`;
+          }
+          if (dropElement && data.dropName) {
+            dropElement.textContent = data.dropName;
+          }
+          console.log('Correo enviado correctamente a:', data.email);
+        }
+      } catch (err) {
+        console.error('Error al sincronizar datos de la compra:', err);
+        // Valores de respaldo si falla la red
+        if (qtyElement) qtyElement.textContent = '1 ACCESO';
+        if (priceElement) priceElement.textContent = '$800 MXN';
+      }
     });
   </script>
 </body>
